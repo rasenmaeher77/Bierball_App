@@ -104,15 +104,24 @@ input, select, textarea, button {
   color: #ffffff;
 }
 
-/* Freies Textfeld: schwebt über allem und verschiebt nichts.
-   Position: top/left geben die MITTE des Textes an, gemessen
-   von der linken oberen Ecke der Seite (z. B. 50% = mittig). */
+/* Freie Textfelder: schweben über allem und verschieben nichts.
+   Sie hängen an einem unsichtbaren Punkt oben in der Seitenmitte
+   (dieselbe Mittelachse wie Überschrift und Zähler). Dadurch bleibt
+   ihr Abstand zu den anderen Elementen gleich, egal wie breit das
+   Fenster ist. */
+.freitext-anker {
+  position: absolute;
+  top: var(--safe-top);
+  left: 50%;
+  width: 0;
+  height: 0;
+  z-index: 15;
+  pointer-events: none; /* Knöpfe darunter bleiben tippbar */
+}
+
+/* Gemeinsamer Stil aller Textfelder */
 .freitext {
   position: absolute;
-  top: 650px;
-  left: 19%;
-  transform: translate(-50%, -50%);
-  z-index: 15;
   margin: 0;
   font-family: "Anton", Impact, sans-serif;
   font-size: 28px;
@@ -120,24 +129,29 @@ input, select, textarea, button {
   line-height: 1.1;
   white-space: nowrap;
   color: rgb(212 201 121);
-  pointer-events: none; /* Knöpfe darunter bleiben tippbar */
-  transform: rotate(45deg);
-  display: inline-block;
+  /* left/top = MITTE des Textes; Drehung je Feld über --drehung */
+  transform: translate(-50%, -50%) rotate(var(--drehung, 0deg));
 }
 
-/* Zweites Textfeld: übernimmt alles von .freitext, nur die Position ist eigen */
+/* Position je Feld:
+   left = Abstand von der Seitenmitte (negativ = nach links),
+   top  = Abstand vom oberen Seitenrand */
+.freitext-1 {
+  left: -136px;
+  top: 600px;
+  --drehung: -30deg;
+}
+
 .freitext-2 {
-  top: 44px;
-  left: 77%;
-  transform: none;
+  left: 171px;
+  top: 59px;
   color: #ffffff;
 }
 
-/* Drittes Textfeld: übernimmt alles von .freitext, eigene Position, nicht gedreht */
 .freitext-3 {
-  top: 630px;
-  left: 61%;
-  transform: rotate(-10deg);
+  left: 111px;
+  top: 600px;
+  --drehung: 10deg;
 }
 
 /* ---------- Zähler ---------- */

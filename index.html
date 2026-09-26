@@ -61,14 +61,15 @@
     </button>
   </main>
 
-  <!-- Freies Textfeld über allem; Position in css/style.css bei .freitext -->
-  <p class="freitext">Mischa♥</p>
-
-  <!-- Zweites freies Textfeld; Position in css/style.css bei .freitext-2 -->
-  <p class="freitext freitext-2">®</p>
-
-  <!-- Drittes freies Textfeld; Position in css/style.css bei .freitext-3 -->
-  <p class="freitext freitext-3">Almilein</p>
+  <!-- Freie Textfelder über allem. Sie hängen an einem unsichtbaren Punkt
+       oben in der Seitenmitte, damit sie beim Ändern der Fenstergröße nicht
+       gegenüber Überschrift und Zählern verrutschen. Position in
+       css/style.css bei .freitext-1, .freitext-2, .freitext-3 -->
+  <div class="freitext-anker">
+    <p class="freitext freitext-1">Mischa♥</p>
+    <p class="freitext freitext-2">®</p>
+    <p class="freitext freitext-3">Almilein</p>
+  </div>
 
   <!-- Modul, weil das Firebase SDK per import() geladen wird -->
   <script type="module" src="js/app.js"></script>
