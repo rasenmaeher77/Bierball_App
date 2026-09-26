@@ -15,12 +15,12 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
 
 /* Aus der Firebase-Konsole: Projekteinstellungen → Meine Apps → Web-App */
 const FIREBASE_CONFIG = {
-  apiKey: "DEIN_API_KEY",
-  authDomain: "DEIN_PROJEKT.firebaseapp.com",
-  projectId: "DEIN_PROJEKT",
-  storageBucket: "DEIN_PROJEKT.firebasestorage.app",
-  messagingSenderId: "DEINE_SENDER_ID",
-  appId: "DEINE_APP_ID"
+  apiKey: "AIzaSyBlsWR2EuyMWXPWeEEis4VPeDrGgvPqamQ",
+  authDomain: "bierballapp-13597.firebaseapp.com",
+  projectId: "bierballapp-13597",
+  storageBucket: "bierballapp-13597.firebasestorage.app",
+  messagingSenderId: "217762106237",
+  appId: "1:217762106237:web:d9efa9e5384e33b8a51a14"
 };
 
 /* Muss mit FIREBASE_VERSION in sw.js übereinstimmen (dort offline gecacht) */
