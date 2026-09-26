@@ -1,8 +1,13 @@
-/* Leere Vorlage – optimiert für iPhone (Safari & Home-Bildschirm-App) */
+/* Bierball Zähler – optimiert für iPhone (Safari & Home-Bildschirm-App) */
 
 :root {
   --bg: #ffffff;
   --text: #000000;
+  --grau: #6e6e73;
+
+  /* Zähler-Knopf, passend zum Überschrift-Kasten */
+  --knopf: #000000;
+  --knopf-text: #ffffff;
 
   /* Abstände für Notch, Dynamic Island und Home-Indikator */
   --safe-top: env(safe-area-inset-top, 0px);
@@ -20,6 +25,9 @@
   :root {
     --bg: #ffffff;
     --text: #000000;
+    --grau: #6e6e73;
+    --knopf: #000000;
+    --knopf-text: #ffffff;
   }
 }
 
@@ -53,201 +61,6 @@ body {
   justify-content: center;
   align-items: center;
   gap: 16px;
-}
-
-/* ---------- Regelwerk ---------- */
-
-.regelwerk {
-  --karte: rgb(250 233 233);
-  --schwarz: #000000;
-  --grau: #8a8a8e;
-  --linie: #e0e0e0;
-  --chip: rgba(0, 0, 0, 0.08);
-  --hervor: #ffffff;
-
-  width: 100%;
-  max-width: 720px;
-}
-
-/* Bilder (z. B. Spielfeld) nie breiter als der Bildschirm */
-.regelwerk img {
-  max-width: 100%;
-  height: auto;
-}
-
-/* Sprungziele nicht unter Notch/Statusleiste verstecken */
-.regelwerk [id] {
-  scroll-margin-top: calc(var(--safe-top) + 16px);
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  html { scroll-behavior: smooth; }
-}
-
-/* Paragrafen-Nummer als Plakette (Inhaltsverzeichnis + Überschriften) */
-.regelwerk .nr {
-  flex: none;
-  min-width: 3.2em;
-  padding: 2px 6px;
-  border-radius: 6px;
-  background: #db3c3c;
-  color: #ffffff;
-  font-size: 14px;
-  font-weight: 700;
-  text-align: center;
-  font-variant-numeric: tabular-nums;
-}
-
-.regelwerk .nr:empty {
-  visibility: hidden;
-}
-
-/* Inhaltsverzeichnis als Karte */
-.inhaltsverzeichnis {
-  margin: 24px 0 40px;
-  padding: 20px 16px 8px;
-  border-radius: 14px;
-
-  border-color: #000000;
-  background: var(--karte);
-  color: var(--schwarz);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
-}
-
-.regelwerk .inhaltsverzeichnis h2 {
-  margin: 0 0 8px;
-  font-family: Impact, sans-serif;
-  font-size: 32px;
-  font-weight: normal;
-}
-
-.inhaltsverzeichnis ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.inhaltsverzeichnis a {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-height: 44px;
-  padding: 8px 4px;
-  border-top: 1px solid var(--linie);
-  color: inherit;
-  text-decoration: none;
-}
-
-.inhaltsverzeichnis > ul > li > a {
-  font-weight: 700;
-}
-
-.inhaltsverzeichnis > ul > li:first-child > a {
-  border-top: none;
-}
-
-.inhaltsverzeichnis a::after {
-  content: "›";
-  margin-left: auto;
-  padding-left: 8px;
-  color: var(--grau);
-  font-size: 22px;
-  line-height: 1;
-}
-
-.inhaltsverzeichnis a:hover,
-.inhaltsverzeichnis a:active {
-  background: var(--chip);
-}
-
-/* Abschnitte und Paragrafen im Text */
-.regelwerk h2 {
-  margin: 40px 0 12px;
-  /* Zeilen gleichmäßig umbrechen, z. B. kein einzelnes "(2" am Zeilenende */
-  text-wrap: balance;
-  font-family: Impact, sans-serif;
-  font-size: 32px;
-  font-weight: normal;
-}
-
-.regelwerk h3 {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  margin: 32px 0 8px;
-  font-size: 19px;
-  line-height: 1.3;
-}
-
-/* Kurzes Aufleuchten des angesprungenen Paragrafen */
-.regelwerk h3:target .nr {
-  animation: aufleuchten 1.6s ease-out;
-}
-
-@keyframes aufleuchten {
-  0%, 40% { background: var(--hervor); transform: scale(1.12); }
-    100%    { background: #db3c3c; transform: scale(1); }
-}
-
-/* Absätze I., II., III. */
-.regelwerk ol[type="I"] {
-  margin: 0;
-  padding-left: 2.4em;
-}
-
-.regelwerk ol[type="I"] > li,
-.regelwerk ul > li {
-  margin-bottom: 8px;
-}
-
-/* Absätze innerhalb eines Punkts (z. B. §12 Abs. III) gleichmäßig */
-.regelwerk li > p {
-  margin: 0 0 8px;
-}
-
-.regelwerk li > :last-child {
-  margin-bottom: 0;
-}
-
-/* Aufzählung 1. 2. 3. innerhalb eines Absatzes */
-.regelwerk li > ol:not([type]) {
-  margin: 0 0 8px;
-  padding-left: 1.6em;
-}
-
-.regelwerk li > ol:not([type]):last-child {
-  margin-bottom: 0;
-}
-
-.regelwerk figure {
-  margin: 16px 0;
-  text-align: center;
-}
-
-.regelwerk .zusammen {
-  white-space: nowrap;
-}
-
-.regelwerk ol[type="I"] > li::marker {
-  color: var(--grau);
-  font-weight: 600;
-}
-
-/* Verweise im Text (z. B. "§12") als kleine Chips */
-.regelwerk a.verweis {
-  padding: 0 2px;
-  border-radius: 4px;
-  background: var(--chip);
-  color: inherit;
-  font-weight: 600;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.regelwerk a.verweis:hover,
-.regelwerk a.verweis:active {
-  background: #454545;
-  color: #ffffff;
 }
 
 /* Verhindert Zoomen beim Antippen von Eingabefeldern (iOS zoomt bei < 16px) */
@@ -288,3 +101,67 @@ input, select, textarea, button {
   color: #ffffff;
 }
 
+
+/* ---------- Zähler ---------- */
+
+.zahl {
+  margin: 0;
+  font-family: "Mischa-Font", sans-serif;
+  font-size: clamp(96px, 34vw, 220px);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+/* Kurzes Hüpfen bei neuem Stand (wird in app.js ausgelöst) */
+.zahl.neu {
+  animation: huepfen 0.3s ease-out;
+}
+
+@keyframes huepfen {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+
+/* Großer, daumenfreundlicher +1-Knopf */
+.plus {
+  width: min(100%, 320px);
+  min-height: 96px;
+  border: none;
+  border-radius: 24px;
+  background: var(--knopf);
+  color: var(--knopf-text);
+  font-family: "Mischa-Font", sans-serif;
+  font-size: 56px;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation; /* kein Doppeltipp-Zoom beim schnellen Tippen */
+  user-select: none;
+  -webkit-user-select: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+}
+
+.plus:active {
+  transform: scale(0.95);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+.plus:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.status {
+  min-height: 1.4em;
+  margin: 0;
+  color: var(--grau);
+  font-size: 15px;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zahl.neu { animation: none; }
+  .plus { transition: none; }
+}

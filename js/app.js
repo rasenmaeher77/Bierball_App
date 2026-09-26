@@ -7,80 +7,111 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
   });
 }
 
-/* Regelwerk anzeigen (Text steht in Regelwerk/regelwerk.js) */
-(function () {
-  var ziel = document.getElementById("regelwerk");
-  if (!ziel || !window.REGELWERK) return;
+/* =========================================================
+   Zähler – gespeichert in Firebase Firestore (Dokument zaehler/haupt).
+   Schutz gegen Zurücksetzen liegt NICHT hier, sondern in den
+   Security Rules (firestore.rules). Dieser Code darf öffentlich sein.
+   ========================================================= */
 
-  ziel.innerHTML = Markdown.render(window.REGELWERK);
+/* Aus der Firebase-Konsole: Projekteinstellungen → Meine Apps → Web-App */
+const FIREBASE_CONFIG = {
+  apiKey: "DEIN_API_KEY",
+  authDomain: "DEIN_PROJEKT.firebaseapp.com",
+  projectId: "DEIN_PROJEKT",
+  storageBucket: "DEIN_PROJEKT.firebasestorage.app",
+  messagingSenderId: "DEINE_SENDER_ID",
+  appId: "DEINE_APP_ID"
+};
 
-  /* Inhaltsverzeichnis aus den Überschriften (## und ###) */
-  var nav = document.createElement("nav");
-  nav.className = "inhaltsverzeichnis";
-  nav.setAttribute("aria-label", "Inhaltsverzeichnis");
+/* Muss mit FIREBASE_VERSION in sw.js übereinstimmen (dort offline gecacht) */
+const FIREBASE_VERSION = "12.19.0";
+const SDK = "https://www.gstatic.com/firebasejs/" + FIREBASE_VERSION + "/";
 
-  var liste = document.createElement("ul");
-  var aktuellerAbschnitt = null;
+const zahl = document.getElementById("zahl");
+const knopf = document.getElementById("plus");
+const statusZeile = document.getElementById("status");
 
-  function span(klasse, text) {
-    var element = document.createElement("span");
-    element.className = klasse;
-    element.textContent = text;
-    return element;
+function zeigeStatus(text) {
+  statusZeile.textContent = text;
+}
+
+/* Zahl kurz „hüpfen“ lassen, wenn sich der Stand ändert */
+function zeigeWert(wert) {
+  const text = wert.toLocaleString("de-DE");
+  if (zahl.textContent === text) return;
+  zahl.textContent = text;
+  zahl.classList.remove("neu");
+  void zahl.offsetWidth; /* Animation neu starten */
+  zahl.classList.add("neu");
+}
+
+async function starteZaehler() {
+  if (FIREBASE_CONFIG.apiKey.startsWith("DEIN_")) {
+    zeigeStatus("Firebase ist noch nicht eingerichtet (siehe README).");
+    return;
   }
 
-  /* "§12 Treffer, Trinken" -> Nummer und Titel getrennt (für die Optik) */
-  function fuelle(element, nr, titel) {
-    element.textContent = "";
-    if (nr !== null) element.append(span("nr", nr), " ");
-    element.append(span("titel", titel));
+  /* SDK per import() laden: Schlägt das fehl (z. B. erster Start ohne
+     Internet), läuft der Rest der Seite trotzdem */
+  let app, fs;
+  try {
+    [app, fs] = await Promise.all([
+      import(SDK + "firebase-app.js"),
+      import(SDK + "firebase-firestore.js")
+    ]);
+  } catch (fehler) {
+    console.warn("Firebase SDK konnte nicht geladen werden:", fehler);
+    zeigeStatus("Zähler konnte nicht geladen werden. Bitte mit Internet öffnen.");
+    return;
   }
 
-  ziel.querySelectorAll("h2, h3").forEach(function (ueberschrift) {
-    var teile = ueberschrift.textContent.match(/^(§\s?\d+)\s+(.*)$/);
-    var nr = teile ? teile[1] : null;
-    var titel = teile ? teile[2] : ueberschrift.textContent;
+  /* Offline-Persistenz: Stand und noch nicht gesendete Klicks liegen in
+     IndexedDB und werden automatisch nachgereicht, sobald wieder Internet da ist */
+  const db = fs.initializeFirestore(app.initializeApp(FIREBASE_CONFIG), {
+    localCache: fs.persistentLocalCache({ tabManager: fs.persistentMultipleTabManager() })
+  });
+  const zaehlerRef = fs.doc(db, "zaehler", "haupt");
+  const klicksRef = fs.collection(db, "klicks");
 
-    var eintrag = document.createElement("li");
-    var link = document.createElement("a");
-    link.href = "#" + ueberschrift.id;
-    /* Unterpunkte ohne § bekommen eine leere Nummer, damit alles bündig bleibt */
-    fuelle(link, ueberschrift.tagName === "H3" && nr === null ? "" : nr, titel);
-    eintrag.appendChild(link);
-    if (nr !== null) fuelle(ueberschrift, nr, titel);
-
-    if (ueberschrift.tagName === "H2" || !aktuellerAbschnitt) {
-      liste.appendChild(eintrag);
-      aktuellerAbschnitt = ueberschrift.tagName === "H2" ? eintrag : null;
-    } else {
-      var unterliste = aktuellerAbschnitt.querySelector("ul");
-      if (!unterliste) {
-        unterliste = document.createElement("ul");
-        aktuellerAbschnitt.appendChild(unterliste);
-      }
-      unterliste.appendChild(eintrag);
+  /* Live-Anzeige auf allen Geräten */
+  fs.onSnapshot(zaehlerRef, { includeMetadataChanges: true }, function (snap) {
+    if (!snap.exists()) {
+      /* Offline beim allerersten Start ist noch nichts im Cache */
+      zeigeStatus(snap.metadata.fromCache
+        ? "Offline – noch kein Zählerstand geladen."
+        : "Startdokument zaehler/haupt fehlt (siehe README).");
+      return;
     }
+
+    zeigeWert(snap.data().wert);
+    knopf.disabled = false;
+
+    if (snap.metadata.hasPendingWrites) {
+      zeigeStatus(navigator.onLine ? "Wird gespeichert …" : "Offline – Klicks werden nachgereicht.");
+    } else if (snap.metadata.fromCache) {
+      zeigeStatus("Offline – zuletzt bekannter Stand.");
+    } else {
+      zeigeStatus("");
+    }
+  }, function (fehler) {
+    console.warn("Zähler nicht lesbar:", fehler);
+    zeigeStatus("Zähler nicht erreichbar.");
   });
 
-  var titel = document.createElement("h2");
-  titel.textContent = "Inhaltsverzeichnis";
-  nav.appendChild(titel);
-  nav.appendChild(liste);
-  ziel.insertBefore(nav, ziel.querySelector("h2"));
+  /* +1: Zähler serverseitig erhöhen (increment verliert bei gleichzeitigen
+     Klicks nichts) und im selben Schreibvorgang einen Klick protokollieren */
+  knopf.addEventListener("click", function () {
+    const batch = fs.writeBatch(db);
+    batch.update(zaehlerRef, { wert: fs.increment(1) });
+    batch.set(fs.doc(klicksRef), { zeit: fs.serverTimestamp() });
 
-  /* Beim Neuladen immer ganz oben starten: Browser soll die alte
-     Scrollposition nicht wiederherstellen, und ein #Sprungziel aus dem
-     Inhaltsverzeichnis wird aus der Adresse entfernt */
-  var navigation = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
-  var neuGeladen = navigation && navigation.type === "reload";
-  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+    /* Nicht abwarten: Offline erfüllt sich das Versprechen erst beim
+       Nachreichen, die Anzeige aktualisiert sich aber sofort */
+    batch.commit().catch(function (fehler) {
+      console.warn("Klick abgelehnt:", fehler);
+      zeigeStatus("Klick wurde abgelehnt.");
+    });
+  });
+}
 
-  if (neuGeladen) {
-    if (location.hash) history.replaceState(null, "", location.pathname + location.search);
-    window.scrollTo({ top: 0, behavior: "instant" });
-  } else if (location.hash) {
-    /* Direktlink wie index.html#paragraf-12 ansteuern */
-    var sprungziel = document.getElementById(decodeURIComponent(location.hash.slice(1)));
-    if (sprungziel) sprungziel.scrollIntoView();
-  }
-})();
+starteZaehler();

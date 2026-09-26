@@ -6,12 +6,12 @@
   <!-- iPhone: richtige Breite, Inhalt bis in die Ecken (Notch/Dynamic Island) -->
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-  <title>Bierball Regelwerk</title>
+  <title>Bierball Zähler</title>
 
   <!-- Als App auf dem Home-Bildschirm (ohne Safari-Leisten) -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Bierball Regelwerk">
+  <meta name="apple-mobile-web-app-title" content="Bierball Zähler">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="format-detection" content="telephone=no">
   <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
@@ -25,21 +25,19 @@
 <body>
   <main class="app">
     <div class="kasten">
-      <h1 class="ueberschrift">Bierball Regelwerk</h1>
+      <h1 class="ueberschrift">Bierball Zähler</h1>
     </div>
 
+    <!-- Zählerstand, wird live aus Firestore befüllt -->
+    <p id="zahl" class="zahl" aria-live="polite">–</p>
 
-    <!-- Wird aus Regelwerk/regelwerk.js befüllt -->
-    <article id="regelwerk" class="regelwerk"></article>
+    <button id="plus" class="plus" type="button" disabled>+1</button>
 
-    <p class="pdf-download">
-      <a href="Regelwerk/Bierball%20Regelwerk%20Version%201.0.pdf" download>Regelwerk als PDF herunterladen</a>
-    </p>
-
+    <!-- Hinweise wie „Offline“ oder „Wird gespeichert …“ -->
+    <p id="status" class="status" role="status"></p>
   </main>
 
-  <script src="Regelwerk/regelwerk.js"></script>
-  <script src="js/markdown.js"></script>
-  <script src="js/app.js"></script>
+  <!-- Modul, weil das Firebase SDK per import() geladen wird -->
+  <script type="module" src="js/app.js"></script>
 </body>
 </html>

@@ -1,0 +1,28 @@
+rules_version = '2';
+
+// Firestore Security Rules für den Bierball Zähler.
+// In der Firebase-Konsole unter Firestore Database → Regeln einfügen
+// und veröffentlichen. Alles, was hier nicht erlaubt ist, ist verboten.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Der Zähler: nur lesen und um genau 1 erhöhen
+    match /zaehler/haupt {
+      allow read: if true;
+      allow create, delete: if false;
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['wert'])
+                    && request.resource.data.wert == resource.data.wert + 1;
+    }
+
+    // Protokoll: ein Eintrag pro Klick, nur zusammen mit einem +1 am Zähler
+    // (im selben Schreibvorgang), Zeitstempel muss die Serverzeit sein
+    match /klicks/{klickId} {
+      allow read: if false;
+      allow create: if request.resource.data.keys().hasOnly(['zeit'])
+                    && request.resource.data.zeit == request.time
+                    && getAfter(/databases/$(database)/documents/zaehler/haupt).data.wert
+                       == get(/databases/$(database)/documents/zaehler/haupt).data.wert + 1;
+      allow update, delete: if false;
+    }
+  }
+}

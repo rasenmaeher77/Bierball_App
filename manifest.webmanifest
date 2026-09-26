@@ -1,7 +1,7 @@
 {
-  "name": "Bierball Regelwerk",
+  "name": "Bierball Zähler",
   "short_name": "Bierball",
-  "description": "",
+  "description": "Gemeinsamer Zähler, live auf allen Geräten",
   "lang": "de",
   "start_url": "./",
   "scope": "./",
