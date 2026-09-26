@@ -97,7 +97,7 @@ input, select, textarea, button {
 .ueberschrift {
   margin: 0;
   font-family: "Anton", Impact, sans-serif;
-  font-size: 120px;
+  font-size: 100px;
   font-weight: normal;
   line-height: 1.1;
   text-align: center;
@@ -109,28 +109,35 @@ input, select, textarea, button {
    von der linken oberen Ecke der Seite (z. B. 50% = mittig). */
 .freitext {
   position: absolute;
-  top: 58px;
-  left: 4%;
+  top: 650px;
+  left: 19%;
   transform: translate(-50%, -50%);
-  z-index: 10;
+  z-index: 15;
   margin: 0;
   font-family: "Anton", Impact, sans-serif;
   font-size: 28px;
   font-weight: normal;
   line-height: 1.1;
   white-space: nowrap;
-  color: rgb(217 208 141);
+  color: rgb(212 201 121);
   pointer-events: none; /* Knöpfe darunter bleiben tippbar */
-  transform: rotate(-60deg);
+  transform: rotate(45deg);
   display: inline-block;
 }
 
 /* Zweites Textfeld: übernimmt alles von .freitext, nur die Position ist eigen */
 .freitext-2 {
   top: 44px;
-  left: 82%;
+  left: 77%;
   transform: none;
   color: #ffffff;
+}
+
+/* Drittes Textfeld: übernimmt alles von .freitext, eigene Position, nicht gedreht */
+.freitext-3 {
+  top: 630px;
+  left: 61%;
+  transform: rotate(-10deg);
 }
 
 /* ---------- Zähler ---------- */
