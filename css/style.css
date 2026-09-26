@@ -1,19 +1,19 @@
 /* Bierball Zähler – optimiert für iPhone (Safari & Home-Bildschirm-App) */
 
 :root {
-  --bg: #ffffff;
+  --bg: #ded27f;
   --text: #000000;
-  --grau: #6e6e73;
+  --grau: rgb(141 131 0 / 0.41);
 
   /* Kasten und Knöpfe (grau wie im Entwurf) */
-  --flaeche: #d4d4d4;
+  --flaeche: #8d8300;
   --rahmen: #555555;
   /* Ausgleichsrunden: blasser dargestellt */
-  --blass: #bdbdbd;
-  --blass-flaeche: #ececec;
+  --blass: rgb(141 131 0 / 0.14);
+  --blass-flaeche: rgb(141 131 0 / 0.41);
   /* Korrekturmodus */
-  --rot: #db3c3c;
-  --rot-flaeche: #f6d4d4;
+  --rot: #d23b3b;
+  --rot-flaeche: #ff6161;
 
   /* Abstände für Notch, Dynamic Island und Home-Indikator */
   --safe-top: env(safe-area-inset-top, 0px);
@@ -31,13 +31,13 @@
   :root {
     --bg: #ffffff;
     --text: #000000;
-    --grau: #6e6e73;
+    --grau: rgb(141 131 0 / 0.41);
     --flaeche: #d4d4d4;
     --rahmen: #555555;
-    --blass: #bdbdbd;
+    --blass: rgb(141 131 0 / 0.14);
     --blass-flaeche: #ececec;
     --rot: #db3c3c;
-    --rot-flaeche: #f6d4d4;
+    --rot-flaeche: #ec6969;
   }
 }
 
@@ -50,8 +50,8 @@ html {
 
 body {
   margin: 0;
-  color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+  color: #8d8300;
+  font-family: Impact, sans-serif;
   font-size: 17px;
   line-height: 1.4;
   -webkit-font-smoothing: antialiased;
@@ -88,22 +88,49 @@ input, select, textarea, button {
 
 /* Überschrift-Kasten */
 .kasten {
-  width: min(100%, 340px);
+  width: min(100%, 500px);
   margin: 24px 0 16px;
   padding: 12px 16px;
-  border: 2px solid var(--rahmen);
-  border-radius: 6px;
   background: var(--flaeche);
 }
 
 .ueberschrift {
   margin: 0;
   font-family: "Anton", Impact, sans-serif;
-  font-size: 72px;
+  font-size: 120px;
   font-weight: normal;
   line-height: 1.1;
   text-align: center;
-  color: #111111;
+  color: #ffffff;
+}
+
+/* Freies Textfeld: schwebt über allem und verschiebt nichts.
+   Position: top/left geben die MITTE des Textes an, gemessen
+   von der linken oberen Ecke der Seite (z. B. 50% = mittig). */
+.freitext {
+  position: absolute;
+  top: 58px;
+  left: 4%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  margin: 0;
+  font-family: "Anton", Impact, sans-serif;
+  font-size: 28px;
+  font-weight: normal;
+  line-height: 1.1;
+  white-space: nowrap;
+  color: rgb(217 208 141);
+  pointer-events: none; /* Knöpfe darunter bleiben tippbar */
+  transform: rotate(-60deg);
+  display: inline-block;
+}
+
+/* Zweites Textfeld: übernimmt alles von .freitext, nur die Position ist eigen */
+.freitext-2 {
+  top: 44px;
+  left: 82%;
+  transform: none;
+  color: #ffffff;
 }
 
 /* ---------- Zähler ---------- */
@@ -145,10 +172,9 @@ input, select, textarea, button {
   width: 64px;
   height: 64px;
   padding: 0;
-  border: 2px solid var(--rahmen);
-  border-radius: 6px;
+  border: 0px solid var(--rahmen);
   background: var(--flaeche);
-  color: #222222;
+  color: #ffffff;
   font-size: 44px;
   font-weight: 300;
   line-height: 1;
@@ -173,24 +199,18 @@ input, select, textarea, button {
 
 /* Ausgleichsrunden blasser */
 .ausgleich {
-  color: var(--blass);
+  color: rgb(141 131 0 / 0.41);
 }
 
 .ausgleich .knopf {
-  border-color: var(--blass);
   background: var(--blass-flaeche);
-  color: var(--blass);
+  color: #ececec;
 }
 
 /* Korrekturmodus: Knöpfe rot, zeigen „−“ */
 .korrektur .knopf {
-  border-color: var(--rot);
   background: var(--rot-flaeche);
-  color: var(--rot);
-}
-
-.korrektur .ausgleich .knopf {
-  opacity: 0.6;
+  color: #ffdede;
 }
 
 .korrektur .ausgleich .knopf:disabled,
@@ -214,10 +234,10 @@ input, select, textarea, button {
   height: 56px;
   margin-bottom: 24px;
   padding: 0;
-  border: 2px solid #333333;
+  border: 2px solid rgb(141 131 0 / 0.41);
   border-radius: 6px;
   background: var(--bg);
-  color: #333333;
+  color: rgb(141 131 0 / 0.41);
   cursor: pointer;
   touch-action: manipulation;
   transition: transform 0.1s ease-out;
@@ -229,7 +249,7 @@ input, select, textarea, button {
 
 .einstellungen[aria-pressed="true"] {
   border-color: var(--rot);
-  background: var(--rot);
+  background: #d23b3b;
   color: #ffffff;
 }
 

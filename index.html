@@ -6,7 +6,7 @@
   <!-- iPhone: richtige Breite, Inhalt bis in die Ecken (Notch/Dynamic Island) -->
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-  <title>Bierball Zähler</title>
+  <title>Bierball</title>
 
   <!-- Als App auf dem Home-Bildschirm (ohne Safari-Leisten) -->
   <meta name="mobile-web-app-capable" content="yes">
@@ -31,21 +31,21 @@
     <!-- Je Paar: Stand (Name, Zahl – Zahl, Name) und darunter die Knöpfe.
          data-feld = Feldname im Firestore-Dokument zaehler/haupt -->
     <section class="paar" aria-label="Gewonnene Runden">
-      <span class="name">Alma</span>
+      <span class="name">alma</span>
       <span class="wert" data-feld="rundenLinks" aria-live="polite">0</span>
       <span class="strich">—</span>
       <span class="wert" data-feld="rundenRechts" aria-live="polite">0</span>
-      <span class="name">Max</span>
+      <span class="name">max</span>
       <button class="knopf links" type="button" data-feld="rundenLinks" aria-label="Runde für Alma" disabled>+</button>
       <button class="knopf rechts" type="button" data-feld="rundenRechts" aria-label="Runde für Max" disabled>+</button>
     </section>
 
     <section class="paar ausgleich" aria-label="Ausgleichsrunden">
-      <span class="name">Alma</span>
+      <span class="name">alma</span>
       <span class="wert" data-feld="ausgleichLinks" aria-live="polite">0</span>
       <span class="strich">—</span>
       <span class="wert" data-feld="ausgleichRechts" aria-live="polite">0</span>
-      <span class="name">Max</span>
+      <span class="name">max</span>
       <button class="knopf links" type="button" data-feld="ausgleichLinks" aria-label="Ausgleichsrunde für Alma" disabled>+</button>
       <button class="knopf rechts" type="button" data-feld="ausgleichRechts" aria-label="Ausgleichsrunde für Max" disabled>+</button>
     </section>
@@ -60,6 +60,12 @@
       </svg>
     </button>
   </main>
+
+  <!-- Freies Textfeld über allem; Position in css/style.css bei .freitext -->
+  <p class="freitext">Mischa♡</p>
+
+  <!-- Zweites freies Textfeld; Position in css/style.css bei .freitext-2 -->
+  <p class="freitext freitext-2">®</p>
 
   <!-- Modul, weil das Firebase SDK per import() geladen wird -->
   <script type="module" src="js/app.js"></script>
