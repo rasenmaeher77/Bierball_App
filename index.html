@@ -12,10 +12,10 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Bierball Zähler">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="format-detection" content="telephone=no">
   <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: dark)">
 
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
@@ -25,16 +25,40 @@
 <body>
   <main class="app">
     <div class="kasten">
-      <h1 class="ueberschrift">Bierball Zähler</h1>
+      <h1 class="ueberschrift">Bierball</h1>
     </div>
 
-    <!-- Zählerstand, wird live aus Firestore befüllt -->
-    <p id="zahl" class="zahl" aria-live="polite">–</p>
+    <!-- Je Paar: Stand (Name, Zahl – Zahl, Name) und darunter die Knöpfe.
+         data-feld = Feldname im Firestore-Dokument zaehler/haupt -->
+    <section class="paar" aria-label="Gewonnene Runden">
+      <span class="name">Alma</span>
+      <span class="wert" data-feld="rundenLinks" aria-live="polite">0</span>
+      <span class="strich">—</span>
+      <span class="wert" data-feld="rundenRechts" aria-live="polite">0</span>
+      <span class="name">Max</span>
+      <button class="knopf links" type="button" data-feld="rundenLinks" aria-label="Runde für Alma" disabled>+</button>
+      <button class="knopf rechts" type="button" data-feld="rundenRechts" aria-label="Runde für Max" disabled>+</button>
+    </section>
 
-    <button id="plus" class="plus" type="button" disabled>+1</button>
+    <section class="paar ausgleich" aria-label="Ausgleichsrunden">
+      <span class="name">Alma</span>
+      <span class="wert" data-feld="ausgleichLinks" aria-live="polite">0</span>
+      <span class="strich">—</span>
+      <span class="wert" data-feld="ausgleichRechts" aria-live="polite">0</span>
+      <span class="name">Max</span>
+      <button class="knopf links" type="button" data-feld="ausgleichLinks" aria-label="Ausgleichsrunde für Alma" disabled>+</button>
+      <button class="knopf rechts" type="button" data-feld="ausgleichRechts" aria-label="Ausgleichsrunde für Max" disabled>+</button>
+    </section>
 
-    <!-- Hinweise wie „Offline“ oder „Wird gespeichert …“ -->
+    <!-- Hinweise wie „Offline“ oder „Korrekturmodus“ -->
     <p id="status" class="status" role="status"></p>
+
+    <!-- Einstellungen: schaltet den Korrekturmodus (−1) ein und aus -->
+    <button id="einstellungen" class="einstellungen" type="button" aria-label="Zähler korrigieren" aria-pressed="false">
+      <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
+        <path fill="currentColor" d="M19.14 12.94a7.5 7.5 0 0 0 0-1.88l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.3 7.3 0 0 0-1.63-.94l-.36-2.54A.5.5 0 0 0 13.9 2.4h-3.84a.5.5 0 0 0-.49.42l-.36 2.54c-.59.24-1.13.56-1.63.94l-2.39-.96a.5.5 0 0 0-.6.22L2.67 8.88a.5.5 0 0 0 .12.64l2.03 1.58a7.5 7.5 0 0 0 0 1.88l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32c.13.22.39.3.6.22l2.39-.96c.5.38 1.04.7 1.63.94l.36 2.54c.04.24.25.42.49.42h3.84c.24 0 .45-.18.49-.42l.36-2.54c.59-.24 1.13-.56 1.63-.94l2.39.96c.22.08.47 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58ZM12 15.6a3.6 3.6 0 1 1 0-7.2 3.6 3.6 0 0 1 0 7.2Z"/>
+      </svg>
+    </button>
   </main>
 
   <!-- Modul, weil das Firebase SDK per import() geladen wird -->

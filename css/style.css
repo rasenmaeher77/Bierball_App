@@ -5,9 +5,15 @@
   --text: #000000;
   --grau: #6e6e73;
 
-  /* Zähler-Knopf, passend zum Überschrift-Kasten */
-  --knopf: #000000;
-  --knopf-text: #ffffff;
+  /* Kasten und Knöpfe (grau wie im Entwurf) */
+  --flaeche: #d4d4d4;
+  --rahmen: #555555;
+  /* Ausgleichsrunden: blasser dargestellt */
+  --blass: #bdbdbd;
+  --blass-flaeche: #ececec;
+  /* Korrekturmodus */
+  --rot: #db3c3c;
+  --rot-flaeche: #f6d4d4;
 
   /* Abstände für Notch, Dynamic Island und Home-Indikator */
   --safe-top: env(safe-area-inset-top, 0px);
@@ -26,8 +32,12 @@
     --bg: #ffffff;
     --text: #000000;
     --grau: #6e6e73;
-    --knopf: #000000;
-    --knopf-text: #ffffff;
+    --flaeche: #d4d4d4;
+    --rahmen: #555555;
+    --blass: #bdbdbd;
+    --blass-flaeche: #ececec;
+    --rot: #db3c3c;
+    --rot-flaeche: #f6d4d4;
   }
 }
 
@@ -47,7 +57,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior: none;
-  background-color: #e2e2e2;
+  background-color: var(--bg);
 }
 
 .app {
@@ -55,10 +65,9 @@ body {
   min-height: 100dvh;
   padding: var(--safe-top) calc(var(--safe-right) + var(--rand)) var(--safe-bottom) calc(var(--safe-left) + var(--rand));
 
-  /* Zentriert alle Kinder (Text, Buttons) untereinander in der Mitte */
+  /* Alles untereinander, mittig; der Einstellungsknopf sitzt ganz unten */
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   gap: 16px;
 }
@@ -70,98 +79,161 @@ input, select, textarea, button {
 }
 
 @font-face {
-  font-family: 'Mischa-Font';
-  src: url("../Schriftarten/BADABB__.TTF") format("truetype");
+  font-family: "Anton";
+  src: url("../Schriftarten/Anton-Regular.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
+/* Überschrift-Kasten */
 .kasten {
-  border: 1px solid #ccc;
-  border-radius: 15px;
-  padding: 16px;
-  margin: 16px 0;
-  background-color: #000000;
-  min-height: 130px;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-
+  width: min(100%, 340px);
+  margin: 24px 0 16px;
+  padding: 12px 16px;
+  border: 2px solid var(--rahmen);
+  border-radius: 6px;
+  background: var(--flaeche);
 }
 
 .ueberschrift {
-  font-family: "Mischa-Font", sans-serif;
-  font-size: 60px;
-  line-height: 1;
   margin: 0;
+  font-family: "Anton", Impact, sans-serif;
+  font-size: 72px;
+  font-weight: normal;
+  line-height: 1.1;
   text-align: center;
-  color: #ffffff;
+  color: #111111;
 }
-
 
 /* ---------- Zähler ---------- */
 
-.zahl {
-  margin: 0;
-  font-family: "Mischa-Font", sans-serif;
-  font-size: clamp(96px, 34vw, 220px);
+/* Ein Paar: Zeile 1 = Alma 0 – 0 Max, Zeile 2 = Knöpfe unter den Namen */
+.paar {
+  display: grid;
+  grid-template-columns: repeat(5, auto);
+  justify-content: center;
+  align-items: center;
+  column-gap: 0.45em;
+  row-gap: 20px;
+  margin: 24px 0;
+  font-size: clamp(28px, 9vw, 44px);
   line-height: 1;
+}
+
+.wert {
+  min-width: 1.2em;
+  text-align: center;
   font-variant-numeric: tabular-nums;
-  color: var(--text);
 }
 
 /* Kurzes Hüpfen bei neuem Stand (wird in app.js ausgelöst) */
-.zahl.neu {
+.wert.neu {
   animation: huepfen 0.3s ease-out;
 }
 
 @keyframes huepfen {
   0%   { transform: scale(1); }
-  40%  { transform: scale(1.12); }
+  40%  { transform: scale(1.25); }
   100% { transform: scale(1); }
 }
 
-/* Großer, daumenfreundlicher +1-Knopf */
-.plus {
-  width: min(100%, 320px);
-  min-height: 96px;
-  border: none;
-  border-radius: 24px;
-  background: var(--knopf);
-  color: var(--knopf-text);
-  font-family: "Mischa-Font", sans-serif;
-  font-size: 56px;
+/* Quadratische, daumenfreundliche Knöpfe */
+.knopf {
+  grid-row: 2;
+  justify-self: center;
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  border: 2px solid var(--rahmen);
+  border-radius: 6px;
+  background: var(--flaeche);
+  color: #222222;
+  font-size: 44px;
+  font-weight: 300;
   line-height: 1;
   cursor: pointer;
   touch-action: manipulation; /* kein Doppeltipp-Zoom beim schnellen Tippen */
   user-select: none;
   -webkit-user-select: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+  transition: transform 0.1s ease-out, background-color 0.2s;
 }
 
-.plus:active {
-  transform: scale(0.95);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+.knopf.links  { grid-column: 1; }
+.knopf.rechts { grid-column: 5; }
+
+.knopf:active {
+  transform: scale(0.92);
 }
 
-.plus:disabled {
-  opacity: 0.4;
+.knopf:disabled {
+  opacity: 0.35;
   cursor: default;
+}
+
+/* Ausgleichsrunden blasser */
+.ausgleich {
+  color: var(--blass);
+}
+
+.ausgleich .knopf {
+  border-color: var(--blass);
+  background: var(--blass-flaeche);
+  color: var(--blass);
+}
+
+/* Korrekturmodus: Knöpfe rot, zeigen „−“ */
+.korrektur .knopf {
+  border-color: var(--rot);
+  background: var(--rot-flaeche);
+  color: var(--rot);
+}
+
+.korrektur .ausgleich .knopf {
+  opacity: 0.6;
+}
+
+.korrektur .ausgleich .knopf:disabled,
+.korrektur .knopf:disabled {
+  opacity: 0.3;
 }
 
 .status {
   min-height: 1.4em;
-  margin: 0;
+  margin: auto 0 0; /* schiebt Status und Einstellungsknopf nach unten */
   color: var(--grau);
   font-size: 15px;
   text-align: center;
 }
 
+/* Einstellungsknopf unten mittig */
+.einstellungen {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 24px;
+  padding: 0;
+  border: 2px solid #333333;
+  border-radius: 6px;
+  background: var(--bg);
+  color: #333333;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.1s ease-out;
+}
+
+.einstellungen:active {
+  transform: scale(0.92);
+}
+
+.einstellungen[aria-pressed="true"] {
+  border-color: var(--rot);
+  background: var(--rot);
+  color: #ffffff;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .zahl.neu { animation: none; }
-  .plus { transition: none; }
+  .wert.neu { animation: none; }
+  .knopf, .einstellungen { transition: none; }
 }

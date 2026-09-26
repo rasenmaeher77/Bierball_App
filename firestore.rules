@@ -6,22 +6,41 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Der Zähler: nur lesen und um genau 1 erhöhen
+    // Die vier Zähler im Dokument zaehler/haupt. Fehlende Felder zählen als 0.
+    function felder() {
+      return ['rundenLinks', 'rundenRechts', 'ausgleichLinks', 'ausgleichRechts'];
+    }
+
+    // Ein Feld bleibt gleich oder ändert sich um genau 1 (nie unter 0)
+    function schrittOk(feld) {
+      let alt = resource.data.get(feld, 0);
+      let neu = request.resource.data.get(feld, 0);
+      return neu == alt || (neu >= 0 && (neu == alt + 1 || neu == alt - 1));
+    }
+
     match /zaehler/haupt {
       allow read: if true;
       allow create, delete: if false;
-      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['wert'])
-                    && request.resource.data.wert == resource.data.wert + 1;
+      // Pro Schreibvorgang genau ein Zähler, um +1 oder −1
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().size() == 1
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(felder())
+                    && schrittOk('rundenLinks')
+                    && schrittOk('rundenRechts')
+                    && schrittOk('ausgleichLinks')
+                    && schrittOk('ausgleichRechts');
     }
 
-    // Protokoll: ein Eintrag pro Klick, nur zusammen mit einem +1 am Zähler
-    // (im selben Schreibvorgang), Zeitstempel muss die Serverzeit sein
+    // Protokoll: ein Eintrag pro Klick, nur zusammen mit genau dieser Änderung
+    // am Zähler (im selben Schreibvorgang), Zeitstempel muss die Serverzeit sein
     match /klicks/{klickId} {
       allow read: if false;
-      allow create: if request.resource.data.keys().hasOnly(['zeit'])
+      allow create: if request.resource.data.keys().hasOnly(['zeit', 'feld', 'schritt'])
                     && request.resource.data.zeit == request.time
-                    && getAfter(/databases/$(database)/documents/zaehler/haupt).data.wert
-                       == get(/databases/$(database)/documents/zaehler/haupt).data.wert + 1;
+                    && request.resource.data.feld in felder()
+                    && request.resource.data.schritt in [1, -1]
+                    && getAfter(/databases/$(database)/documents/zaehler/haupt).data.get(request.resource.data.feld, 0)
+                       == get(/databases/$(database)/documents/zaehler/haupt).data.get(request.resource.data.feld, 0)
+                          + request.resource.data.schritt;
       allow update, delete: if false;
     }
   }

@@ -10,7 +10,7 @@
    Firestore seine eigene Offline-Speicherung.
    ========================================================= */
 
-const CACHE = "mischa-app-v5";
+const CACHE = "mischa-app-v6";
 
 /* Muss mit FIREBASE_VERSION in js/app.js übereinstimmen */
 const FIREBASE_VERSION = "12.19.0";
@@ -25,7 +25,7 @@ const FILES = [
   "./icons/apple-touch-icon.png",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
-  "./Schriftarten/BADABB__.TTF"
+  "./Schriftarten/Anton-Regular.ttf"
 ];
 
 const SDK_FILES = [SDK + "firebase-app.js", SDK + "firebase-firestore.js"];

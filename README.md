@@ -1,19 +1,24 @@
 # Bierball Zähler
 
-Ein gemeinsamer Zähler als iPhone-Web-App (HTML, CSS, JavaScript, keine Frameworks).
+Spielstand-Zähler für Bierball als iPhone-Web-App (HTML, CSS, JavaScript, keine Frameworks).
+Vier Zähler: gewonnene Runden (oben) und Ausgleichsrunden (unten, blasser), je für Alma und Max.
 Der Stand liegt in Firebase Firestore, ist auf allen Geräten gleich und aktualisiert sich live.
-Man kann ihn nur um 1 erhöhen, nicht zurücksetzen. Das erzwingen die Security Rules auf dem Server.
+
+Mit „+“ zählt man hoch. Der Einstellungsknopf unten schaltet den Korrekturmodus ein: Die Knöpfe
+werden rot und ziehen 1 ab, zum Beispiel nach einem Verklicken. Die Security Rules auf dem Server
+erlauben pro Klick nur genau +1 oder −1 und nie Werte unter 0. Direkt auf einen beliebigen Wert
+setzen oder löschen kann man nichts.
 
 | Datei / Ordner         | Zweck                                                   |
 |------------------------|---------------------------------------------------------|
-| `index.html`           | Überschrift, Zahl, „+1“-Knopf                           |
+| `index.html`           | Überschrift, vier Zähler, Einstellungsknopf             |
 | `css/style.css`        | Grundstil, Safe-Areas, Dark Mode, Zähler                |
 | `js/app.js`            | Service Worker, Firebase-Config, Zähler-Logik           |
 | `firestore.rules`      | Security Rules (in der Firebase-Konsole einfügen)       |
 | `manifest.webmanifest` | Name, Icon und Farben auf dem Home-Bildschirm           |
 | `sw.js`                | Service Worker; neue Dateien in `FILES` eintragen       |
 | `icons/`               | App-Icons (180, 192, 512 px)                            |
-| `Schriftarten/`        | Schrift für Überschrift, Zahl und Knopf                 |
+| `Schriftarten/`        | „Anton“ für die Überschrift (Lizenz: `Anton-OFL.txt`)   |
 
 ## Firebase einrichten
 
@@ -30,9 +35,11 @@ Man kann ihn nur um 1 erhöhen, nicht zurücksetzen. Das erzwingen die Security 
 4. **Startdokument anlegen:** Reiter „Daten“ → „Sammlung starten“
    - Sammlungs-ID: `zaehler`
    - Dokument-ID: `haupt` (nicht automatisch generieren lassen)
-   - Feld: `wert`, Typ `number`, Wert `0`
+   - Felder: keine nötig (ein leeres Dokument reicht). Die Zähler `rundenLinks`, `rundenRechts`,
+     `ausgleichLinks` und `ausgleichRechts` gelten als 0, bis zum ersten Mal geklickt wird.
 
-   Die Sammlung `klicks` legt die App beim ersten Klick selbst an.
+   Die Sammlung `klicks` legt die App beim ersten Klick selbst an. Sie protokolliert jeden Klick
+   mit Serverzeit, Feld und Schritt (+1/−1). „Links“ ist Alma, „Rechts“ ist Max.
 5. **Rules einfügen:** Reiter „Regeln“ → Inhalt komplett durch `firestore.rules` ersetzen → „Veröffentlichen“.
    Es dauert bis zu einer Minute, bis die Rules greifen.
 6. **Veröffentlichen:** Änderungen auf GitHub pushen. Die App auf dem iPhone einmal mit Internet öffnen,
@@ -49,7 +56,7 @@ zum lokalen Testen zusätzlich `http://localhost:*/*`. Das hält Fremde davon ab
 eigenen Seiten zu benutzen. Ein echter Schutz ist es nicht, denn den Referer kann man fälschen.
 Den eigentlichen Schutz liefern die Rules.
 
-## Testen, dass Zurücksetzen abgelehnt wird
+## Testen, dass Manipulationen abgelehnt werden
 
 **In der Browser-Konsole** (App öffnen → Entwicklertools → Konsole; am iPhone über Safari am Mac → Entwickler):
 
@@ -57,13 +64,15 @@ Den eigentlichen Schutz liefern die Rules.
 const fs = await import("https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js");
 const ref = fs.doc(fs.getFirestore(), "zaehler", "haupt");
 
-await fs.updateDoc(ref, { wert: 0 });                    // zurücksetzen      → abgelehnt
-await fs.setDoc(ref, { wert: 999 });                     // beliebiger Wert   → abgelehnt
-await fs.updateDoc(ref, { wert: fs.increment(-1) });     // runterzählen      → abgelehnt
-await fs.updateDoc(ref, { wert: fs.increment(5) });      // mehr als 1        → abgelehnt
-await fs.updateDoc(ref, { wert: fs.increment(1), x: 1 }); // Zusatzfeld       → abgelehnt
-await fs.deleteDoc(ref);                                 // löschen           → abgelehnt
-await fs.updateDoc(ref, { wert: fs.increment(1) });      // +1                → klappt
+await fs.updateDoc(ref, { rundenLinks: 99 });                        // beliebiger Wert   → abgelehnt
+await fs.setDoc(ref, {});                                            // alles überschreiben → abgelehnt
+await fs.updateDoc(ref, { rundenLinks: fs.increment(5) });           // mehr als 1        → abgelehnt
+await fs.updateDoc(ref, { rundenLinks: fs.increment(1),
+                          rundenRechts: fs.increment(1) });          // zwei auf einmal   → abgelehnt
+await fs.updateDoc(ref, { hack: 1 });                                // fremdes Feld      → abgelehnt
+await fs.deleteDoc(ref);                                             // löschen           → abgelehnt
+await fs.updateDoc(ref, { rundenLinks: fs.increment(1) });           // +1                → klappt
+await fs.updateDoc(ref, { rundenLinks: fs.increment(-1) });          // −1 (Korrektur)    → klappt
 ```
 
 Jede abgelehnte Zeile endet mit `FirebaseError: Missing or insufficient permissions.`
@@ -75,9 +84,9 @@ oder in der Firebase-Konsole nachsehen.
 
 ```sh
 curl -X PATCH \
-  "https://firestore.googleapis.com/v1/projects/PROJEKT/databases/(default)/documents/zaehler/haupt?updateMask.fieldPaths=wert&key=API_KEY" \
+  "https://firestore.googleapis.com/v1/projects/PROJEKT/databases/(default)/documents/zaehler/haupt?updateMask.fieldPaths=rundenLinks&key=API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"fields":{"wert":{"integerValue":"0"}}}'
+  -d '{"fields":{"rundenLinks":{"integerValue":"99"}}}'
 ```
 
 Erwartet: `"code": 403`, `"status": "PERMISSION_DENIED"`.
