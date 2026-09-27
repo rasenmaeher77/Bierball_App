@@ -13,6 +13,7 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
    Security Rules (firestore.rules). Dieser Code darf öffentlich sein.
    ========================================================= */
 
+// Firebase-Account: hansbraun101@gmail.com
 /* Aus der Firebase-Konsole: Projekteinstellungen → Meine Apps → Web-App */
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyBlsWR2EuyMWXPWeEEis4VPeDrGgvPqamQ",
